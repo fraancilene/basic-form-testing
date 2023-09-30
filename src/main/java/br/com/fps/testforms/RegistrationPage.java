@@ -36,6 +36,14 @@ public class RegistrationPage {
         dsl.clickButtonCheckbox("elementosForm:comidaFavorita:0");
     }
 
+    public void setFavoriteFoodChicken() {
+        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
+    }
+
+    public void setFavoriteFoodPizza() {
+        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:2");
+    }
+
     public void setFavoriteFoodVegan() {
         dsl.clickButtonCheckbox("elementosForm:comidaFavorita:3");
     }
