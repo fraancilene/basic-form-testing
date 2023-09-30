@@ -1,5 +1,6 @@
 package br.com.fps.testforms;
 
+import br.com.fps.dsl.DSL;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 public class TestesElementosBasicos {
 
    private WebDriver driver;
+   private DSL dsl;
 
     @Before
     public void openBrowser(){
@@ -26,6 +28,8 @@ public class TestesElementosBasicos {
         driver = new ChromeDriver();
         driver.manage().window().setSize(new Dimension(1000, 765));
         driver.get("file:" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
+
+        dsl = new DSL(driver);
     }
 
     @After
@@ -35,47 +39,35 @@ public class TestesElementosBasicos {
 
     @Test
     public void testTextField(){
-        driver.findElement(By.id("elementosForm:nome")).sendKeys("Francilene");
-        String value = driver.findElement(By.id("elementosForm:nome")).getAttribute("value"); // retorna o valor
-        assertEquals("Francilene", value);
+
+        dsl.toWrite("elementosForm:nome","Francilene" );
+        assertEquals("Francilene", dsl.getValueField("elementosForm:nome"));
     }
 
     @Test
     public void testTextArea(){
-        driver.findElement(By.id("elementosForm:sugestoes")).sendKeys("Testando o text Area");
-        String value = driver.findElement(By.id("elementosForm:sugestoes")).getAttribute("value"); // retorna o valor
-        assertEquals("Testando o text Area", value);
+        dsl.toWrite("elementosForm:sugestoes", "Testando o text Area");
+        assertEquals("Testando o text Area", dsl.getValueField("elementosForm:sugestoes"));
     }
 
     @Test
     public void testRadioButton(){
-        driver.findElement(By.id("elementosForm:comidaFavorita:0")).click();
+        dsl.clickButtonRadio("elementosForm:comidaFavorita:0");
         Assert.assertTrue(driver.findElement(By.id("elementosForm:comidaFavorita:0")).isSelected());
     }
 
     @Test
     public void testCheckboxButton(){
         driver.findElement(By.id("elementosForm:sexo:0")).click();
-        Assert.assertTrue(driver.findElement(By.id("elementosForm:sexo:0")).isSelected());
+        Assert.assertTrue(dsl.checkButtonSelected("elementosForm:sexo:0"));
     }
 
 
     // formas de trabalhar com dropdown
     @Test
     public void testDropdown(){
-        WebElement element = driver.findElement(By.id("elementosForm:escolaridade"));
-        Select dropdown = new Select(element);
-
-        // selecionando por index
-        //dropdown.selectByIndex(2);
-
-        // selecionando pelo valor
-        //dropdown.selectByValue("especializacao");
-
-        //Selecionando pelo texto visível
-        dropdown.selectByVisibleText("Mestrado");
-
-        assertEquals("Mestrado", dropdown.getFirstSelectedOption().getText());
+        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Mestrado");
+        assertEquals("Mestrado", dsl.getSelectedValueFromDropdown("elementosForm:escolaridade"));
     }
 
     @Test
@@ -102,12 +94,14 @@ public class TestesElementosBasicos {
 
     @Test
     public void testDropdown2(){
+
+        dsl.dropdownSelectedOption("elementosForm:esportes", "Natacao");
+        dsl.dropdownSelectedOption("elementosForm:esportes", "Corrida");
+        dsl.dropdownSelectedOption("elementosForm:esportes", "O que eh esporte?");
+
         WebElement element = driver.findElement(By.id("elementosForm:esportes"));
         Select dropdown = new Select(element);
 
-        dropdown.selectByVisibleText("Natacao");
-        dropdown.selectByVisibleText("Corrida");
-        dropdown.selectByVisibleText("O que eh esporte?");
 
         // Selecionando 3 elementos
         List<WebElement> selectedElements = dropdown.getAllSelectedOptions();
@@ -122,16 +116,16 @@ public class TestesElementosBasicos {
 
     @Test
     public void testButtonSimples(){
+        dsl.clickButton("buttonSimple");
+
         WebElement botao = driver.findElement(By.id("buttonSimple"));
-        botao.click();
-        assertEquals("Obrigado!", botao.getAttribute("value"));
+        assertEquals("Obrigado!",botao.getAttribute("value"));
     }
 
     @Test
     public void testLink(){
-        driver.findElement(By.linkText("Voltar")).click();
-        WebElement result = driver.findElement(By.id("resultado"));
-        assertEquals("Voltou!", result.getText());
+        dsl.clickLink("Voltar");
+        assertEquals("Voltou!", dsl.getText("resultado"));
 
         // Assert.fail() - faz o teste falhar
         // ou @Ignore - que ignora o teste
@@ -140,15 +134,13 @@ public class TestesElementosBasicos {
 
     @Test
     public void testTituloFormComTagName(){
-        WebElement tituloForm = driver.findElement(By.tagName("h3"));
-        assertEquals("Campo de Treinamento", tituloForm.getText() );
+        assertEquals("Campo de Treinamento", dsl.getTextBy(By.tagName("h3")));
 
     }
 
     @Test
     public void testSpanComClassName(){
-        WebElement textSpan = driver.findElement(By.className("facilAchar"));
-        assertEquals("Cuidado onde clica, muitas armadilhas...", textSpan.getText());
+        assertEquals("Cuidado onde clica, muitas armadilhas...", dsl.getTextBy(By.className("facilAchar")));
     }
 
 

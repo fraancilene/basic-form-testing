@@ -1,7 +1,9 @@
 package br.com.fps.testforms;
 
+import br.com.fps.dsl.DSL;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.openqa.selenium.Alert;
@@ -15,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class TestesAlerts {
 
     private WebDriver driver;
+    private DSL dsl;
 
     @Before
     public void openBrowser(){
@@ -22,6 +25,7 @@ public class TestesAlerts {
         driver = new ChromeDriver();
         driver.manage().window().setSize(new Dimension(1000, 765));
         driver.get("file:" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
+        dsl = new DSL(driver);
     }
 
     @After
@@ -31,67 +35,64 @@ public class TestesAlerts {
 
     @Test
     public void testAlertSimples(){
-        driver.findElement(By.id("alert")).click();
+        dsl.clickButton("alert");
 
-        // alterando o foco para o alerta
-        Alert alert = driver.switchTo().alert();
-        String textoAlerta = alert.getText();
-        assertEquals("Alert Simples", textoAlerta);
-        alert.accept(); // aceitando o alerta
+        String msg = dsl.getTextAlertAndAccept();
+        assertEquals("Alert Simples", msg);
+        //dsl.getTextAlertAndAccept("Alert Simples");
 
-        driver.findElement(By.id("elementosForm:nome")).sendKeys(textoAlerta);
     }
 
     @Test
     public void testConfirmandoAlerta(){
-        driver.findElement(By.id("confirm")).click();
 
-        // alterando o foco para o alerta
-        Alert alert = driver.switchTo().alert();
-        String textoAlerta = alert.getText();
-        assertEquals("Confirm Simples", textoAlerta);
-        alert.accept(); // aceitando o alerta
+        dsl.clickButton("confirm");
+        String msg = dsl.getTextAlertAndAccept();
+        assertEquals("Confirm Simples", msg);
 
-        String textoAlerta2 = alert.getText();
-        assertEquals("Confirmado", textoAlerta2);
-        alert.accept();
+        //dsl.getTextAlertAndAccept("Confirm Simples");
+        String msgAlert2 = dsl.getTextAlertAndAccept();
+        assertEquals("Confirmado", msgAlert2);
+        dsl.toWrite("elementosForm:sugestoes", msgAlert2);
 
-        driver.findElement(By.id("elementosForm:nome")).sendKeys(textoAlerta2);
 
     }
 
     @Test
     public void testNegandoAlerta(){
-        driver.findElement(By.id("confirm")).click();
+        dsl.clickButton("confirm");
 
-        // alterando o foco para o alerta
-        Alert alert = driver.switchTo().alert();
-        String textoAlerta = alert.getText();
-        assertEquals("Confirm Simples", textoAlerta);
-        alert.dismiss(); // aceitando o alerta
+        String msg = dsl.getTextAlertAndDismiss();
+        assertEquals("Confirm Simples", msg);
 
-        String textoAlerta2 = alert.getText();
-        assertEquals("Negado", textoAlerta2);
-        alert.accept();
+        String msgAlert2 = dsl.getTextAlertAndAccept();
+        assertEquals("Negado", msgAlert2);
+        dsl.toWrite("elementosForm:sugestoes", msgAlert2);
 
-        driver.findElement(By.id("elementosForm:nome")).sendKeys(textoAlerta2);
+
+
 
     }
 
     @Test
-    public void testPrompt(){
-        driver.findElement(By.id("prompt")).click();
+    public void testPromptWithAccept(){
 
-        Alert prompt = driver.switchTo().alert();
-        assertEquals("Digite um numero", prompt.getText());
-        prompt.sendKeys("12");
-        prompt.accept();
+        dsl.clickButton("prompt");
+        dsl.writeInAlertAndAccept("12");
 
-        assertEquals("Era 12?", prompt.getText());
-        prompt.accept();
+        dsl.getTextAndAcceptPrompt("Era 12?");
+        dsl.getTextAndAcceptPrompt(":D");
 
-        assertEquals(":D", prompt.getText());
-        prompt.accept();
+    }
+
+    @Test
+    public void testPromptWithDismiss(){
+
+        dsl.clickButton("prompt");
+        dsl.writeInAlertAndAccept("12");
+
+        dsl.getTextAndDismissPrompt("Era 12?");
+        dsl.getTextAndAcceptPrompt(":(");
 
     }
 }

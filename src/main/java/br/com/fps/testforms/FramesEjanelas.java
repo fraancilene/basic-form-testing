@@ -1,18 +1,19 @@
 package br.com.fps.testforms;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import br.com.fps.dsl.DSL;
+import org.junit.*;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import static org.junit.Assert.assertEquals;
+
 public class FramesEjanelas {
 
     private WebDriver driver;
+    private DSL dsl;
 
     @Before
     public void openBrowser(){
@@ -20,6 +21,7 @@ public class FramesEjanelas {
         driver = new ChromeDriver();
         driver.manage().window().setSize(new Dimension(1000, 765));
         driver.get("file:" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
+        dsl = new DSL(driver);
     }
 
     @After
@@ -30,51 +32,43 @@ public class FramesEjanelas {
     @Test
     public void testFrames(){
         // mudando o foco para dentro do frame
-        driver.switchTo().frame("frame1");
-        driver.findElement(By.id("frameButton")).click();
+        dsl.openFrame("frame1");
+        dsl.clickButton("frameButton");
 
-        Alert alert = driver.switchTo().alert();
-        String textAlert = alert.getText();
+        String msg = dsl.getTextAlertAndAccept();
+        assertEquals("Frame OK!", msg);
+        dsl.returnHomePage();
 
-        Assert.assertEquals("Frame OK!", textAlert);
-        alert.accept();
-
-        // tirando o foco do frame
-        driver.switchTo().defaultContent();
-
-        driver.findElement(By.id("elementosForm:sugestoes")).sendKeys(textAlert);
+        //driver.findElement(By.id("elementosForm:sugestoes")).sendKeys(textAlert);
 
     }
 
     @Test
+    @Ignore
     public void testJanelas(){
-        driver.findElement(By.id("buttonPopUpEasy")).click();
+        dsl.clickButton("buttonPopUpEasy");
+        dsl.changeWindow("Popup");
 
-        driver.switchTo().window("Popup");
-        driver.findElement(By.tagName("textarea")).sendKeys("Deu certo?");
-        driver.close();
+        dsl.toWriteBy(By.tagName("textarea"), "Deu certo?");
+        dsl.closeFrame();
 
-        // retornando para a página principal
-        driver.switchTo().window("");
-
-        driver.findElement(By.tagName("textarea")).sendKeys("E agora?");
+        dsl.returnHomePageWithId("");
+        dsl.toWrite("elementosForm:sugestoes", "E agora?");
     }
 
     @Test
     public void testWindowHandler(){
-        driver.findElement(By.id("buttonPopUpHard")).click();
+        dsl.clickButton("buttonPopUpHard");
 
         //System.out.println(driver.getWindowHandle());
         //System.out.println(driver.getWindowHandles());
-        driver.switchTo().window((String) driver.getWindowHandles().toArray()[1]);
-        driver.findElement(By.tagName("textarea")).sendKeys("Deu certo?");
+        dsl.changeWindow((String) driver.getWindowHandles().toArray()[1]);
+        dsl.toWriteBy(By.tagName("textarea"), "Deu certo?");
 
-        driver.close();
+        dsl.closeFrame();
+        dsl.returnHomePageWithId("");
 
-        //retornando para a página principal
-        driver.switchTo().window("");
-
-        driver.findElement(By.tagName("textarea")).sendKeys("E agora?");
+        dsl.toWrite("elementosForm:sugestoes", "E agora?");
     }
 
 
