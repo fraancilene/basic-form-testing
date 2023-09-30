@@ -13,6 +13,7 @@ public class TestCadastroForms {
 
     private WebDriver driver;
     private DSL dsl;
+    private RegistrationPage page;
 
     @Before
     public void launchBrowser(){
@@ -21,6 +22,7 @@ public class TestCadastroForms {
         driver.manage().window().setSize(new Dimension(1000, 765));
         driver.get("file:" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
         dsl = new DSL(driver);
+        page  = new RegistrationPage(driver);
     }
 
     @After
@@ -28,128 +30,100 @@ public class TestCadastroForms {
         driver.quit();
     }
 
+    @Test
+    public void cadastroComSucesso(){
+
+        page.setName("Francilene");
+        page.setSurname("Silva");
+        page.setFemaleGender();
+        page.setFavoriteFoodMeat();
+        page.setEducation("Superior");
+        page.setSport("Futebol");
+        page.registration();
+
+        assertEquals("Cadastrado!", page.getRegistrationResult());
+
+    }
+
 
     @Test
     public void testCadastroComErroDeNomeObrigatorio(){
-        dsl.toWrite("elementosForm:nome", "");
-        dsl.toWrite("elementosForm:sobrenome", "Silva");
-        dsl.clickButtonRadio("elementosForm:sexo:1");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
 
-        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Superior");
-        dsl.dropdownSelectedOption("elementosForm:esportes", "Futebol" );
-        dsl.clickButton("elementosForm:cadastrar");
-        dsl.getTextAlertAndAccept();
+        page.setName("");
+        page.setSurname("Silva");
+        page.setFemaleGender();
+        page.setFavoriteFoodMeat();
+        page.setEducation("Superior");
+        page.setSport("Futebol");
+        page.registration();
 
-
-        assertEquals("Status: Nao cadastrado", dsl.getText("resultado"));
+        assertEquals("Nome eh obrigatorio", page.validateAlert());
 
     }
 
     @Test
     public void testCadastroComErroDeSobrenomeObrigatorio(){
 
-        dsl.toWrite("elementosForm:nome", "Pedro");
-        dsl.toWrite("elementosForm:sobrenome", "");
-        dsl.clickButtonRadio("elementosForm:sexo:0");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
+        page.setName("Francilene");
+        page.setSurname("");
+        page.setFemaleGender();
+        page.setFavoriteFoodMeat();
+        page.setEducation("Superior");
+        page.setSport("Futebol");
+        page.registration();
 
-        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Superior");
+        assertEquals("Sobrenome eh obrigatorio", page.validateAlert());
 
-        dsl.dropdownSelectedOption("elementosForm:esportes", "Futebol" );
-
-        dsl.clickButton("elementosForm:cadastrar");
-
-        dsl.getTextAlertAndAccept();
-
-        assertEquals("Status: Nao cadastrado", dsl.getText("resultado"));
     }
 
     @Test
     public void testCadastroComErroDeSexoObrigatorio(){
 
-        dsl.toWrite("elementosForm:nome", "Francilene");
-        dsl.toWrite("elementosForm:sobrenome", "Silva");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
-        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Superior");
-        dsl.dropdownSelectedOption("elementosForm:esportes", "Futebol" );
-        dsl.clickButton("elementosForm:cadastrar");
+        page.setName("Francilene");
+        page.setSurname("");
+        page.setFavoriteFoodMeat();
+        page.setEducation("Superior");
+        page.setSport("Futebol");
+        page.registration();
 
-        dsl.getTextAlertAndAccept();
-
-        assertEquals("Status: Nao cadastrado", dsl.getText("resultado"));
+        assertEquals("Sobrenome eh obrigatorio", page.validateAlert());
     }
 
     @Test
     public void testCadastroComErroOqueEhEsporte(){
-        dsl.toWrite("elementosForm:nome", "Francilene");
-        dsl.toWrite("elementosForm:sobrenome", "Silva");
-        dsl.clickButtonRadio("elementosForm:sexo:1");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
 
-        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Superior");
+        page.setName("Francilene");
+        page.setSurname("Silva");
+        page.setFemaleGender();
+        page.setFavoriteFoodMeat();
+        page.setEducation("Superior");
+        page.setSport("Futebol", "O que eh esporte?");
+        page.registration();
 
-        dsl.dropdownSelectedOption("elementosForm:esportes", "Futebol" );
-        dsl.dropdownSelectedOption("elementosForm:esportes", "O que eh esporte?" );
-
-        dsl.clickButton("elementosForm:cadastrar");
-
-        dsl.getTextAlertAndAccept();
-
-
-        assertEquals("Status: Nao cadastrado", dsl.getText("resultado"));
-
-
+        assertEquals("Voce faz esporte ou nao?", page.validateAlert());
     }
 
 
     @Test
     public void testCadastroComErroOqueEhVegetarianoOuNao(){
 
-        dsl.toWrite("elementosForm:nome", "Francilene");
-        dsl.toWrite("elementosForm:sobrenome", "Silva");
-        dsl.clickButtonRadio("elementosForm:sexo:1");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:3");
+        page.setName("Francilene");
+        page.setSurname("Silva");
+        page.setFemaleGender();
+        page.setFavoriteFoodMeat();
+        page.setFavoriteFoodVegan();
+        page.registration();
 
-        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Superior");
-        dsl.dropdownSelectedOption("elementosForm:esportes", "Futebol" );
-        dsl.clickButton("elementosForm:cadastrar");
-
-
-        dsl.getTextAlertAndAccept();
-
-        assertEquals("Status: Nao cadastrado", dsl.getText("resultado"));
-
-
+        assertEquals("Tem certeza que voce eh vegetariano?", page.validateAlert());
     }
 
-
-    @Test
-    public void cadastroComSucesso(){
-
-        dsl.toWrite("elementosForm:nome", "Francilene");
-        dsl.toWrite("elementosForm:sobrenome", "Silva");
-        dsl.clickButtonRadio("elementosForm:sexo:1");
-        dsl.clickButtonCheckbox("elementosForm:comidaFavorita:1");
-
-        dsl.dropdownSelectedOption("elementosForm:escolaridade", "Superior");
-        dsl.dropdownSelectedOption("elementosForm:esportes", "Futebol" );
-        dsl.clickButton("elementosForm:cadastrar");
-
-
-        assertEquals("Cadastrado!", dsl.getTextBy(By.xpath("//*[@id=\"resultado\"]/span")));
-
-    }
 
     @Test
     public void validateWriteenNames(){
-
-        dsl.toWrite("elementosForm:nome", "Francilene");
-        assertEquals("Francilene", dsl.getValueField("elementosForm:nome"));
-
-        dsl.toWriteBy(By.id("elementosForm:nome"), "Pedro");
-        assertEquals("Pedro", dsl.getValueField("elementosForm:nome"));
+        page.setName("Francilene");
+        assertEquals("Francilene", page.getValue());
+        page.setNameBy("Pedro");
+        assertEquals("Pedro", page.getValue());
 
     }
 
