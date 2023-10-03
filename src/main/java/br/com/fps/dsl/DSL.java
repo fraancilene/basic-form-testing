@@ -1,9 +1,6 @@
 package br.com.fps.dsl;
 
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.ArrayList;
@@ -190,6 +187,16 @@ public class DSL {
     public void closeFrame(){
         driver.close();
     }
+
+    // JAVASCRIPT
+    public Object runJS(String cmd, Object... param){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        return js.executeScript(cmd, param);
+    }
+
+
+
+
 }
 
 

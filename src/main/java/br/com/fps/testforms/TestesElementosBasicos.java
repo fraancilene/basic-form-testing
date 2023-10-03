@@ -5,10 +5,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 
@@ -34,7 +31,7 @@ public class TestesElementosBasicos {
 
     @After
     public void closeBrowser(){
-        driver.quit();
+        //driver.quit();
     }
 
     @Test
@@ -143,6 +140,19 @@ public class TestesElementosBasicos {
         assertEquals("Cuidado onde clica, muitas armadilhas...", dsl.getTextBy(By.className("facilAchar")));
     }
 
+
+    @Test
+    public void testJavascript(){
+
+        dsl.runJS("document.getElementById('elementosForm:nome').value = 'Escrito via js'");
+
+        // alterando elemento via js
+        dsl.runJS("document.getElementById('elementosForm:sobrenome').type = 'radio'");
+
+        dsl.runJS("arguments[0].style.border = arguments[1]", driver.findElement(By.id("elementosForm:nome")), "solid 4px red");
+
+
+    }
 
 
 }

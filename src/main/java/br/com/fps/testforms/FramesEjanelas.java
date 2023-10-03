@@ -2,10 +2,7 @@ package br.com.fps.testforms;
 
 import br.com.fps.dsl.DSL;
 import org.junit.*;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +23,7 @@ public class FramesEjanelas {
 
     @After
     public void closeBrowser(){
-        driver.quit();
+        //driver.quit();
     }
 
     @Test
@@ -69,6 +66,19 @@ public class FramesEjanelas {
         dsl.returnHomePageWithId("");
 
         dsl.toWrite("elementosForm:sugestoes", "E agora?");
+    }
+
+    @Test
+    public void testFramWithScroll(){
+
+        // dando o scroll na vertical
+        WebElement frame = driver.findElement(By.id("frame2"));
+        dsl.runJS("window.scrollBy(0, arguments[0])", frame.getLocation().y);
+
+        dsl.openFrame("frame2");
+        dsl.clickButton("frameButton");
+        String msg = dsl.getTextAlertAndAccept();
+        assertEquals("Frame OK!", msg);
     }
 
 
